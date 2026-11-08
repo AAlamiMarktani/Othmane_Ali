@@ -1,81 +1,570 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+/* =========================================================
+   Variables
+   ========================================================= */
 :root {
-  --bg: #eef2f7;
-  --card: #ffffff;
-  --ink: #16202e;
-  --muted: #5b6778;
-  --line: #cfd7e3;
-  --accent: #1b5e8c;
-  --accent-dark: #134566;
-  --err-bg: #fdecec;
-  --err: #a12a2a;
-  --ok-bg: #e6f4ea;
-  --ok: #1e6b36;
+  --bg: #04060d;
+  --card: rgba(13, 19, 38, 0.6);
+  --ink: #eaf0ff;
+  --muted: #8f9cbc;
+  --line: rgba(140, 170, 255, 0.16);
+  --line-hover: rgba(140, 200, 255, 0.38);
+
+  --cyan: #38e1ff;
+  --violet: #8b5cff;
+  --pink: #ff5cc8;
+
+  --ring: rgba(56, 225, 255, 0.28);
+  --err-bg: rgba(255, 77, 109, 0.1);
+  --err: #ff7a93;
+  --ok-bg: rgba(52, 232, 160, 0.1);
+  --ok: #4defb0;
+
+  --radius: 22px;
+  --radius-sm: 12px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-* { box-sizing: border-box; }
+/* =========================================================
+   Base
+   ========================================================= */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  color-scheme: dark;
+}
 
 body {
   margin: 0;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
   color: var(--ink);
+  line-height: 1.5;
   background: var(--bg);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+  background: rgba(56, 225, 255, 0.3);
+  color: #fff;
+}
+
+/* =========================================================
+   Décor : aurore animée + grille
+   ========================================================= */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Nappes lumineuses qui dérivent lentement */
+body::before {
+  inset: -25%;
+  background:
+    radial-gradient(
+      38% 38% at 22% 28%,
+      rgba(56, 225, 255, 0.24),
+      transparent 70%
+    ),
+    radial-gradient(
+      42% 42% at 78% 72%,
+      rgba(139, 92, 255, 0.28),
+      transparent 70%
+    ),
+    radial-gradient(
+      30% 30% at 70% 18%,
+      rgba(255, 92, 200, 0.13),
+      transparent 70%
+    );
+  filter: blur(46px);
+  animation: drift 24s ease-in-out infinite alternate;
+}
+
+/* Grille fine qui s'estompe vers les bords */
+body::after {
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(140, 170, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 170, 255, 0.06) 1px, transparent 1px);
+  background-size: 52px 52px;
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    #000 15%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(ellipse at center, #000 15%, transparent 72%);
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(-4%, -3%, 0) scale(1) rotate(0deg);
+  }
+  to {
+    transform: translate3d(4%, 4%, 0) scale(1.14) rotate(6deg);
+  }
+}
+
+/* =========================================================
+   Mise en page
+   ========================================================= */
 .page {
   min-height: 100vh;
+  min-height: 100dvh;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: 32px 16px;
 }
 
+/* Carte en verre avec bordure dégradée animée */
 .card {
+  position: relative;
   width: 100%;
-  max-width: 420px;
-  background: var(--card);
-  padding: 32px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+  max-width: 440px;
+  padding: 46px 40px 34px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.05), transparent 40%),
+    var(--card);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
+  box-shadow:
+    0 0 0 1px var(--line),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 40px 90px -25px rgba(0, 0, 0, 0.85),
+    0 0 90px -30px rgba(56, 225, 255, 0.45);
+  animation: rise 0.8s var(--ease) both;
 }
 
-h1 { margin: 0 0 4px; font-size: 1.6rem; }
-.sub { margin: 0 0 20px; color: var(--muted); font-size: 0.95rem; }
+.card.wide {
+  max-width: 540px;
+}
 
-label { margin: 12px 0 6px; font-size: 0.9rem; font-weight: 600; }
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-input {
-  padding: 10px 12px;
+/* Bordure lumineuse qui tourne */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--angle, 0deg),
+    transparent 0%,
+    var(--cyan) 12%,
+    transparent 28%,
+    transparent 58%,
+    var(--violet) 72%,
+    var(--pink) 80%,
+    transparent 92%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: spin-border 8s linear infinite;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes spin-border {
+  to {
+    --angle: 360deg;
+  }
+}
+
+/* =========================================================
+   Titres
+   ========================================================= */
+h1 {
+  margin: 0 0 8px;
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+  background: linear-gradient(
+    100deg,
+    #fff 25%,
+    var(--cyan) 60%,
+    var(--violet) 85%,
+    #fff 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine-text 7s ease-in-out infinite alternate;
+}
+
+@keyframes shine-text {
+  to {
+    background-position: 100% 0;
+  }
+}
+
+.sub {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* =========================================================
+   Formulaire
+   ========================================================= */
+label {
+  margin: 18px 0 8px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #b9c6e4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 14px 16px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(5, 9, 22, 0.55);
+  color: var(--ink);
+  font: inherit;
   font-size: 1rem;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s,
+    background 0.25s,
+    transform 0.25s var(--ease);
+}
+
+input::placeholder {
+  color: #55617d;
+}
+
+input:hover {
+  border-color: var(--line-hover);
 }
 
 input:focus-visible,
-button:focus-visible {
-  outline: 3px solid rgba(27, 94, 140, 0.35);
-  outline-offset: 1px;
-  border-color: var(--accent);
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  background: rgba(8, 14, 32, 0.85);
+  border-color: var(--cyan);
+  box-shadow:
+    0 0 0 4px var(--ring),
+    0 0 26px -4px rgba(56, 225, 255, 0.5);
+  transform: translateY(-1px);
 }
 
-button {
-  margin-top: 22px;
-  padding: 12px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
+/* Remplissage automatique du navigateur */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 1000px #0a1226 inset;
+  caret-color: var(--ink);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Champ invalide, uniquement après saisie (ajouter placeholder=" ") */
+input:not(:placeholder-shown):invalid {
+  border-color: var(--err);
+}
+input:not(:placeholder-shown):invalid:focus-visible {
+  box-shadow:
+    0 0 0 4px rgba(255, 122, 147, 0.2),
+    0 0 26px -4px rgba(255, 77, 109, 0.5);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 14px;
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.hint.error {
+  color: var(--err);
+}
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 20px 0 0;
+  font-size: 0.88rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
   cursor: pointer;
 }
-button:hover:not(:disabled) { background: var(--accent-dark); }
-button:disabled { opacity: 0.6; cursor: not-allowed; }
+.check input {
+  width: 18px;
+  height: 18px;
+  margin: 2px 0 0;
+  padding: 0;
+  flex: none;
+  accent-color: var(--cyan);
+}
 
-.msg { padding: 10px 12px; border-radius: 6px; font-size: 0.9rem; margin-bottom: 4px; }
-.msg.error { background: var(--err-bg); color: var(--err); }
-.msg.ok { background: var(--ok-bg); color: var(--ok); }
+/* Champ avec bouton "afficher / masquer" */
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.field input {
+  padding-right: 84px;
+}
+.field .toggle {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  margin: 0;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--cyan);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: none;
+}
+.field .toggle:hover:not(:disabled) {
+  background: rgba(56, 225, 255, 0.1);
+  box-shadow: none;
+}
 
-.switch { margin: 18px 0 0; text-align: center; font-size: 0.9rem; color: var(--muted); }
-.switch a { color: var(--accent); font-weight: 600; text-decoration: none; }
-.switch a:hover { text-decoration: underline; }
+/* =========================================================
+   Bouton
+   ========================================================= */
+button {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-top: 30px;
+  padding: 15px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    100deg,
+    var(--cyan),
+    var(--violet) 70%,
+    var(--pink)
+  );
+  background-size: 180% 100%;
+  background-position: 0% 0;
+  color: #04101c;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 12px 32px -10px rgba(56, 225, 255, 0.6);
+  transition:
+    background-position 0.6s var(--ease),
+    box-shadow 0.3s,
+    transform 0.15s var(--ease);
+}
+
+/* Reflet qui traverse le bouton au survol */
+button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 50%;
+  height: 100%;
+  z-index: -1;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.7s var(--ease);
+}
+
+button:hover:not(:disabled) {
+  background-position: 100% 0;
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px -10px rgba(139, 92, 255, 0.75);
+}
+button:hover:not(:disabled)::before {
+  left: 130%;
+}
+button:active:not(:disabled) {
+  transform: translateY(1px) scale(0.99);
+}
+button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px var(--ring),
+    0 12px 32px -10px rgba(56, 225, 255, 0.6);
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Chargement : ajouter .loading au bouton */
+button.loading {
+  color: transparent;
+}
+button.loading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(4, 16, 28, 0.3);
+  border-top-color: #04101c;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   Messages (erreur / succès)
+   ========================================================= */
+.msg {
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  animation: pop 0.35s var(--ease) both;
+}
+.msg.error {
+  background: var(--err-bg);
+  color: var(--err);
+  border-color: rgba(255, 122, 147, 0.3);
+}
+.msg.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+  border-color: rgba(77, 239, 176, 0.3);
+}
+.msg:empty {
+  display: none;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =========================================================
+   Lien de bas de carte
+   ========================================================= */
+.switch {
+  margin: 26px 0 0;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.switch a {
+  color: var(--cyan);
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: text-shadow 0.2s;
+}
+.switch a:hover {
+  text-shadow: 0 0 14px rgba(56, 225, 255, 0.8);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.switch a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* =========================================================
+   Mobile & accessibilité
+   ========================================================= */
+@media (max-width: 520px) {
+  .card {
+    padding: 34px 22px 26px;
+  }
+  .row {
+    grid-template-columns: 1fr;
+  }
+  h1 {
+    font-size: 1.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .card,
+  .card::before,
+  h1,
+  .msg,
+  button.loading::after {
+    animation: none;
+  }
+  * {
+    transition: none !important;
+  }
+}
+
+/* Navigateurs sans backdrop-filter : fond plus opaque pour garder la lisibilité */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .card {
+    background: rgba(10, 16, 32, 0.95);
+  }
+}
